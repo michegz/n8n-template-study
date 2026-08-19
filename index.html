@@ -243,7 +243,8 @@ pre{background:var(--ink);color:#EDF1F2;padding:.85rem 1rem;overflow-x:auto;font
       <li><a href="data/index.json">index.json</a></li>
       <li><a href="sources/template-4295.json">template-4295.json</a></li>
     </ul>
-    <p class="credit" style="max-width:64ch"><strong>What this script does not catch:</strong> it verifies arithmetic against the stored scan, not the scan itself. If the checker's rules are wrong, every number here is confidently wrong in the same direction. It also cannot tell you whether a template changed after it was scanned.</p>
+    <p class="credit" style="max-width:64ch"><strong>What this script does not catch.</strong> It verifies arithmetic against the stored scan, not the scan itself. If the checker's rules are wrong, every number here is confidently wrong in the same direction. <strong>It also does not validate rule names</strong>: rename a rule to something invented and the script prints it in the table and still exits 0. And it cannot tell you whether a template changed after it was scanned.</p>
+    <p class="credit" style="max-width:64ch"><strong>I probed it rather than trust it.</strong> Against the published copy, downloaded from this page into an empty directory: dropping one row from <code>findings.jsonl</code> fails with exit 1, duplicating a workflow id fails, inflating one <code>findingCount</code> by 50 fails, and unmodified data passes. <strong>Renaming a rule to an invented string is not caught</strong>, which is why it is written above. The full probe table is in the header of <a href="recount.py">recount.py</a>.</p>
   </div>
 </section>
 
