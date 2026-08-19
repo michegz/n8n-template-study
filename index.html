@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I scanned 1,999 published n8n templates. 78% have no error handling.</title>
+<meta name="description" content="A static scan of 1,999 templates from the public n8n library. 78% make network calls with no retry and no error branch. The dataset and the script that reproduces every number are on this page.">
+<link rel="canonical" href="https://michegz.github.io/n8n-template-study/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EDF1F2'/%3E%3Crect x='5' y='8' width='22' height='3' fill='%23101A1F'/%3E%3Crect x='5' y='14.5' width='22' height='3' fill='%23B3301C'/%3E%3Crect x='5' y='21' width='22' height='3' fill='%23101A1F'/%3E%3C/svg%3E">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://michegz.github.io/n8n-template-study/">
+<meta property="og:site_name" content="Michelle W.">
+<meta property="og:title" content="I scanned 1,999 published n8n templates. 78% have no error handling.">
+<meta property="og:description" content="36,234 nodes. 5,665 findings. The raw dataset and the script that regenerates every number are published with it, so you can try to catch me.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="I scanned 1,999 published n8n templates. 78% have no error handling.">
+<meta name="twitter:description" content="36,234 nodes. 5,665 findings. The raw dataset and the reproduction script are on the page.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF1F2;--grid:#E2E8E9;--rule:#C3CFD2;
+  --ink:#101A1F;--ink-soft:#5B6E75;--stamp:#2A4B8D;--alarm:#B3301C;
+  --pad:clamp(1.25rem,4vw,3rem);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:1.55;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 var(--pad)}
+a{color:var(--stamp)}
+:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+
+.masthead{border-bottom:1px solid var(--ink);padding:14px 0 12px;display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between}
+.masthead-id{font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin:0}
+.masthead-state{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:0}
+
+.hero{padding:clamp(2.5rem,7vw,4.5rem) 0 clamp(1.75rem,4vw,2.75rem);display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(1.5rem,5vw,3.5rem);align-items:end}
+.hero-head{font-family:"Archivo",sans-serif;font-variation-settings:"wdth" 118;font-weight:700;font-size:clamp(2rem,5.6vw,3.6rem);line-height:.98;letter-spacing:-.015em;margin:0 0 1.1rem;text-transform:uppercase}
+.hero-head em{font-style:normal;display:block;font-variation-settings:"wdth" 78;color:var(--stamp)}
+.hero-sub{margin:0 0 .9rem;max-width:50ch;color:var(--ink-soft);font-size:1.02rem}
+.hero-sub:last-child{margin-bottom:0}
+.hero-sub strong{color:var(--ink);font-weight:600}
+.who{border:1px solid var(--ink);background:rgba(255,255,255,.55);padding:1rem 1.15rem}
+.who p{margin:0 0 .5rem;font-size:.92rem}
+.who p:last-child{margin:0}
+.who-name{font-family:"Archivo",sans-serif;font-variation-settings:"wdth" 88;font-weight:700;font-size:1.15rem;text-transform:uppercase;letter-spacing:.01em}
+.who-line{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.who-link{font-family:"IBM Plex Mono",monospace;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;display:inline-block;margin-top:.4rem}
+
+.band{border-top:1px solid var(--ink);padding:clamp(1.75rem,4vw,2.5rem) 0}
+.band-head{display:flex;flex-wrap:wrap;gap:.75rem 1.5rem;align-items:baseline;justify-content:space-between;margin-bottom:1.5rem}
+.band-title{font-family:"Archivo",sans-serif;font-variation-settings:"wdth" 82;font-weight:700;font-size:clamp(1.1rem,2.6vw,1.5rem);text-transform:uppercase;letter-spacing:.02em;margin:0}
+.band-note{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.08em;color:var(--ink-soft);margin:0;max-width:52ch}
+
+.benches{display:grid;gap:1.1rem}
+.bench{
+  border:1px solid var(--ink);background:rgba(255,255,255,.62);
+  display:grid;grid-template-columns:5.5rem minmax(0,1fr);
+  text-decoration:none;color:inherit;transition:background .2s ease;
+}
+.bench:hover,.bench:focus-visible{background:#fff}
+.bench-n{
+  border-right:1px solid var(--ink);display:flex;align-items:center;justify-content:center;
+  font-family:"Archivo",sans-serif;font-variation-settings:"wdth" 72;font-weight:700;
+  font-size:2.1rem;line-height:1;color:var(--ink-soft);
+}
+.bench:hover .bench-n{color:var(--stamp)}
+.bench-body{padding:1.1rem 1.25rem}
+.bench-title{font-family:"Archivo",sans-serif;font-variation-settings:"wdth" 88;font-weight:700;font-size:1.12rem;text-transform:uppercase;letter-spacing:.01em;margin:0 0 .5rem}
+.bench-claim{margin:0 0 .75rem;font-size:.97rem;color:var(--ink-soft)}
+.bench-claim strong{color:var(--ink);font-weight:600}
+.bench-meta{display:grid;grid-template-columns:6.5rem minmax(0,1fr);gap:.3rem .75rem;font-size:.86rem;padding-top:.7rem;border-top:1px dotted var(--rule)}
+.bench-meta dt{font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-soft);padding-top:.15rem}
+.bench-meta dd{margin:0;color:var(--ink-soft)}
+.bench-meta dd.limit{color:var(--alarm)}
+.bench-go{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--stamp);margin:.8rem 0 0}
+
+.rules{margin:0;padding:0;list-style:none;display:grid;gap:.8rem}
+.rules li{display:grid;grid-template-columns:1.6rem minmax(0,1fr);gap:.6rem;align-items:start}
+.rules span{font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;color:var(--stamp);padding-top:.2rem}
+.rules p{margin:0;color:var(--ink-soft);font-size:.95rem}
+.rules b{color:var(--ink);font-weight:600}
+
+.colophon{border-top:1px solid var(--ink);padding:1.5rem 0 3rem}
+.sig{margin:0 0 .5rem;font-size:.95rem}
+.sig strong{font-weight:600}
+.sig-link{font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.credit{margin:.75rem 0 0;font-size:.82rem;color:var(--ink-soft);max-width:62ch}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:minmax(0,1fr);gap:1.75rem;align-items:start}
+  .bench{grid-template-columns:minmax(0,1fr)}
+  .bench-n{border-right:0;border-bottom:1px solid var(--ink);justify-content:flex-start;padding:.7rem 1.25rem;font-size:1.5rem}
+  .bench-meta{grid-template-columns:minmax(0,1fr);gap:.15rem}
+  .bench-meta dt{padding-top:.5rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--ink);border:1px solid var(--ink);margin:0 0 1.5rem}
+.stat{background:rgba(255,255,255,.72);padding:1rem 1.1rem}
+.stat b{display:block;font-family:"Archivo",sans-serif;font-variation-settings:"wdth" 78;font-weight:700;font-size:clamp(1.5rem,4vw,2.3rem);line-height:1;color:var(--ink)}
+.stat b.alarm{color:var(--alarm)}
+.stat span{display:block;font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:.45rem}
+table{width:100%;border-collapse:collapse;font-size:.92rem;background:rgba(255,255,255,.55)}
+caption{caption-side:bottom;text-align:left;font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding-top:.6rem}
+th,td{border:1px solid var(--rule);padding:.5rem .65rem;text-align:left}
+th{font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+td.num{text-align:right;font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+tr.top td{font-weight:600}
+tr.top td.num{color:var(--alarm)}
+.prose{max-width:66ch}
+.prose p{margin:0 0 1rem}
+.prose h3{font-family:"Archivo",sans-serif;font-variation-settings:"wdth" 88;font-weight:700;font-size:1.05rem;text-transform:uppercase;letter-spacing:.01em;margin:1.6rem 0 .6rem}
+.prose strong{font-weight:600}
+.check{border:1px solid var(--ink);background:rgba(255,255,255,.72);padding:1.15rem 1.25rem;margin-top:1.25rem}
+.check h3{font-family:"Archivo",sans-serif;font-variation-settings:"wdth" 82;font-weight:700;font-size:clamp(1.1rem,2.6vw,1.5rem);text-transform:uppercase;letter-spacing:.02em;margin:0 0 .8rem}
+.check p.lede{margin:0 0 .6rem;max-width:64ch;color:var(--ink-soft);font-size:1.02rem}
+.check p.lede strong{color:var(--ink);font-weight:600}
+pre{background:var(--ink);color:#EDF1F2;padding:.85rem 1rem;overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:.82rem;margin:.6rem 0 1rem}
+.dl{display:flex;flex-wrap:wrap;gap:.5rem;margin:.5rem 0 0;padding:0;list-style:none}
+.dl a{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;font-weight:600;border:1px solid var(--stamp);padding:.35rem .6rem;text-decoration:none;display:inline-block}
+.dl a:hover{background:var(--stamp);color:var(--paper)}
+.limits{border-left:3px solid var(--alarm);padding-left:1rem;margin-top:1rem}
+@media (max-width:760px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  table{font-size:.84rem}
+  th,td{padding:.4rem .45rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="masthead-id">Michelle W. &middot; Lafayette, Louisiana</p>
+  <p class="masthead-state">Study &middot; August 2026 &middot; data included</p>
+</header>
+
+<section class="hero">
+  <div>
+    <h1 class="hero-head">I scanned 1,999 n8n templates<em>78% have no error handling</em></h1>
+    <p class="hero-sub">n8n's template library is where most people start. You find a workflow someone published, import it, wire in your credentials, and you are running. <strong>I wanted to know what you are actually importing.</strong></p>
+    <p class="hero-sub">Every number on this page is recomputable. <strong>The raw scan and the script that regenerates the whole table are published with it</strong>, so you can try to catch me.</p>
+  </div>
+  <div class="who">
+    <p class="who-name">Michelle W.</p>
+    <p class="who-line">Automation engineer</p>
+    <p>Twenty years of business operations behind the code: dispatch, inventory, payroll across four locations, and an invoicing app that replaced a manual spreadsheet process.</p>
+    <a class="who-link" href="https://www.upwork.com/freelancers/~01b59471ec1e32fbdb">Hire me on Upwork &rarr;</a>
+  </div>
+</section>
+
+<section class="band">
+  <div class="band-head">
+    <h2 class="band-title">What the scan found</h2>
+    <p class="band-note">1,999 of the 11,518 templates in the public library, pulled from the template API and read as JSON. No workflow was executed.</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><b>1,999</b><span>Workflows scanned</span></div>
+    <div class="stat"><b>36,234</b><span>Nodes read</span></div>
+    <div class="stat"><b class="alarm">5,665</b><span>Findings</span></div>
+    <div class="stat"><b class="alarm">129</b><span>Were clean</span></div>
+  </div>
+  <table>
+    <caption>Workflows affected, and the share of the 1,999. The median workflow had two findings.</caption>
+    <thead><tr><th scope="col">Defect</th><th scope="col">Workflows</th><th scope="col">Rate</th></tr></thead>
+    <tbody>
+  <tr class="top"><td>Network calls with no retry and no error branch</td><td class="num">1,554</td><td class="num">78%</td></tr>
+  <tr><td>Missing top-level <code>id</code> (breaks CLI import)</td><td class="num">957</td><td class="num">48%</td></tr>
+  <tr><td>Scheduled trigger with no timezone</td><td class="num">449</td><td class="num">22%</td></tr>
+  <tr><td>Unfilled placeholders left in parameters</td><td class="num">276</td><td class="num">14%</td></tr>
+  <tr><td>Unguarded API calls inside a batch loop</td><td class="num">215</td><td class="num">11%</td></tr>
+  <tr><td>Deprecated nodes</td><td class="num">174</td><td class="num">9%</td></tr>
+  <tr><td>Pinned test data saved into the workflow</td><td class="num">158</td><td class="num">8%</td></tr>
+  <tr><td>Nodes not connected to any trigger</td><td class="num">152</td><td class="num">8%</td></tr>
+  <tr><td>Disabled nodes left in place</td><td class="num">134</td><td class="num">7%</td></tr>
+  <tr><td>No trigger at all</td><td class="num">45</td><td class="num">2%</td></tr>
+  <tr><td>Legacy <code>$node["name"]</code> references</td><td class="num">34</td><td class="num">2%</td></tr>
+  <tr><td><code>$env</code> expressions (denied by default)</td><td class="num">31</td><td class="num">2%</td></tr>
+  <tr><td>Email node missing required parameters</td><td class="num">22</td><td class="num">1%</td></tr>
+  <tr><td>Connections pointing at nodes that don't exist</td><td class="num">15</td><td class="num">1%</td></tr>
+  <tr><td>API key hardcoded into the workflow body</td><td class="num">1</td><td class="num">0.1%</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="band">
+  <div class="band-head">
+    <h2 class="band-title">The 78% is the whole story</h2>
+  </div>
+  <div class="prose">
+    <p>More than three in four templates make network calls, HTTP requests, API nodes, database writes, email sends, with <strong>no retry configured, no error output branch, and no error workflow set on the workflow itself</strong>.</p>
+    <p>When any of those calls hits a timeout, a rate limit, or an expired credential, the execution stops and <strong>nothing tells you</strong>. No alert, no retry, no fallback. The workflow does not crash loudly. It stops, and the run disappears into the execution log.</p>
+    <p>This is the mechanism behind every "our automation quietly stopped working weeks ago" story. It is not exotic. It is the default.</p>
+    <p>To be fair to the authors: published templates are demonstrations. They are written to show a pattern, not to survive production. The problem is that nobody tells the person importing it that the difference exists, and the workflow looks finished. <strong>There is no visual difference on the canvas between a node that will retry and one that will not.</strong></p>
+
+    <h3>The three that surprised me</h3>
+    <p><strong>Pinned data. 158 workflows, and it is the sneakiest one.</strong> Pinned data is replayed on manual runs in the editor. Production ignores it and hits the real source. So the workflow passes every test you run by hand, against a fixed fake payload, and behaves differently the first time it fires for real. It does not look like a defect. It looks like a workflow that works.</p>
+    <p><strong>Connections pointing at nodes that do not exist. 15 workflows, 34 dead references.</strong> One published template, "Automated Lead Scraper: Apify to Google Sheets", has a node named <code>Manual Trigger</code>, while its connections are wired from a node named <code>Start</code> that is not in the file. n8n imports it without a word of complaint. <strong>Four of its six nodes are dead on arrival.</strong> Anyone who imported that template got a workflow that does nothing, and nothing on screen says so.</p>
+    <p><strong>One template has an API key sitting in its body.</strong> A workflow titled "Creating a Secure Webhook" carries what the checker flags as an OpenAI-style key pasted into a parameter value instead of an n8n credential. <strong>One in 1,999 is rare and I am not going to inflate it into an epidemic.</strong> It is worth naming because a secret in the workflow body travels in every export, backup and screenshot of that workflow, forever.</p>
+
+    <h3>What I would check on anything you import</h3>
+    <p>1. <strong>Add retries to every network node.</strong> Three attempts, a couple of seconds apart. This one change addresses the 78%.<br>
+    2. <strong>Set an error workflow</strong>, or give fallible nodes an error branch that records the failure somewhere a human looks.<br>
+    3. <strong>Delete pinned data before you trust a test.</strong> If it passed with pinned data, it has not been tested.<br>
+    4. <strong>Search the workflow for placeholder strings</strong> before activating it.<br>
+    5. <strong>Set the timezone</strong> if anything is scheduled, or your 9am job runs on server time and shifts twice a year.<br>
+    6. <strong>Open the canvas and look for islands.</strong> A node with no path back to a trigger never runs.<br>
+    7. <strong>Grep the JSON for anything that looks like a key</strong> before you import somebody else's workflow, and before you export your own.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="band-head">
+    <h2 class="band-title">Method, and what it cannot see</h2>
+    <p class="band-note">Stated up front, because a checker that hides its blind spots is worse than no checker.</p>
+  </div>
+  <div class="prose">
+    <p>The checker is static analysis. It reads the exported JSON and matches known failure patterns. <strong>It never executed a workflow, and no account access was involved.</strong></p>
+    <div class="limits">
+      <p><strong>What that means it cannot see.</strong> It cannot tell you whether your credentials are valid, whether an API you depend on changed its contract, or whether the logic is right. <strong>A workflow can pass every one of these checks and still be wrong.</strong></p>
+      <p>I know that specifically, because it happened to me. I wrote a workflow whose job was to watch other workflows and alert on failures. It passed the checker. Then I rebuilt the test data from scratch instead of reusing my original fixture, and it broke immediately: it was filtering executions on a timestamp field the records did not always carry. In JavaScript a missing date produces an Invalid Date, and every comparison against it is false. <strong>Every failure was being filtered out.</strong> That workflow would have reported "no failures" forever and looked perfectly healthy doing it.</p>
+      <p>Static checks find the patterns. Running the thing finds the rest.</p>
+    </div>
+    <p><strong>Sample bias.</strong> These are 1,999 of the 11,518 templates in the public library, taken from the most-surfaced end of it. They are demonstrations by design, and a production workflow inside a company may look nothing like them. What the sample does tell you is what the most-copied starting points on the internet look like, and those are what a great many production workflows were copied from.</p>
+    <p><strong>One rate is measured, not counted.</strong> "78% have no error handling" means 78% of the scanned workflows contain at least one network-facing node with no retry, no error branch, and no error workflow set. A workflow with no network calls at all cannot fail this check, so the figure describes workflows that reach the network, which is nearly all of them.</p>
+  </div>
+
+  <div class="check">
+    <h3>Check me</h3>
+    <p class="lede">The scan is not a screenshot. <strong>Download it and regenerate the table yourself.</strong> <code>recount.py</code> recomputes every figure above and exits non-zero if the two data files disagree with each other.</p>
+    <pre>python3 recount.py</pre>
+    <ul class="dl">
+      <li><a href="recount.py">recount.py</a></li>
+      <li><a href="data/summary.jsonl">summary.jsonl</a></li>
+      <li><a href="data/findings.jsonl">findings.jsonl</a></li>
+      <li><a href="data/index.json">index.json</a></li>
+      <li><a href="sources/template-4295.json">template-4295.json</a></li>
+    </ul>
+    <p class="credit" style="max-width:64ch"><strong>What this script does not catch:</strong> it verifies arithmetic against the stored scan, not the scan itself. If the checker's rules are wrong, every number here is confidently wrong in the same direction. It also cannot tell you whether a template changed after it was scanned.</p>
+  </div>
+</section>
+
+<footer class="colophon">
+  <p class="sig">Built by <strong>Michelle W.</strong>, automation engineer, Lafayette, Louisiana.
+  I fix automations that broke and build the ones that never got finished.
+  <a class="sig-link" href="https://www.upwork.com/freelancers/~01b59471ec1e32fbdb">Hire me on Upwork</a></p>
+  <p class="credit">Scan run 15 August 2026 against the public n8n template API. The lead-scraper example was re-pulled live on 19 August 2026 and pinned in <code>sources/</code>. No workflow was executed and no account access was used.</p>
+  <p class="credit">Three benches you can run in your browser: <a href="https://michegz.github.io/guardrail-bench/">Bench 01</a>, nine hostile model outputs against a validation node. <a href="https://michegz.github.io/agent-authz-bench/">Bench 02</a>, an agent against a booking API with one missing authorization check. <a href="https://michegz.github.io/price-in-the-url/">Bench 03</a>, where you edit the price in a payment link and see what the office sees. All three plus who I am: <a href="https://michegz.github.io/">michegz.github.io</a>.</p>
+</footer>
+
+</div>
+</body>
+</html>
