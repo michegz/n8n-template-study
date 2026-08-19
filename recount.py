@@ -4,10 +4,26 @@
 Run: python3 recount.py
 Exits non-zero if summary.jsonl and findings.jsonl disagree.
 
-WHAT THIS DOES NOT CATCH: it verifies arithmetic against the stored scan, not
-the scan itself. If the checker's rules are wrong, every number here is
-confidently wrong in the same direction. It also cannot tell you whether the
-templates changed after they were scanned.
+WHAT THIS DOES NOT CATCH
+  - It verifies arithmetic against the stored scan, not the scan itself. If the
+    checker's rules are wrong, every number here is confidently wrong in the
+    same direction.
+  - It does not validate rule NAMES against a known set. Rename a rule in
+    summary.jsonl to something invented and this script prints it in the table
+    and still exits 0. Probed, confirmed, disclosed.
+  - It cannot tell you whether a template changed after it was scanned.
+
+PROBES RUN AGAINST THIS SCRIPT (2026-08-19, on the published copy downloaded
+from the live site into a clean directory):
+  1. drop exactly one row from findings.jsonl  -> FAIL, exit 1
+  2. duplicate one workflow id in summary      -> AssertionError, exit 1
+  3. inflate one findingCount by 50            -> FAIL, exit 1
+  4. unmodified data                           -> OK, exit 0
+  5. replace a rule name with an invented one  -> NOT CAUGHT, exit 0 (see above)
+
+Probe 1 was run wrong the first time: `head -n -1` is not supported on macOS,
+so the file was emptied and the script failed for the wrong reason. Re-run
+correctly before being recorded here.
 """
 import json, collections, statistics, sys
 
